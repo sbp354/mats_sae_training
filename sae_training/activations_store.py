@@ -3,7 +3,7 @@ from datasets import load_dataset
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformer_lens import HookedTransformer
-
+import einops
 
 class ActivationsStore:
     """
@@ -149,9 +149,13 @@ class ActivationsStore:
 
         # Insert activations directly into pre-allocated buffer
         # pbar = tqdm(total=n_batches_in_buffer, desc="Filling buffer")
+        i = 0
+        
         for refill_batch_idx_start in refill_iterator:
             refill_batch_tokens = self.get_batch_tokens()
             refill_activations = self.get_activations(refill_batch_tokens)
+            if len(refill_activations.shape)>3:
+                refill_activations = einops.rearrange(refill_activations, 'b seq n_heads d_head -> b seq (n_heads d_head)')
             new_buffer[
                 refill_batch_idx_start : refill_batch_idx_start + batch_size
             ] = refill_activations

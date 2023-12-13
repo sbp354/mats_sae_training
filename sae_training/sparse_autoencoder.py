@@ -67,10 +67,12 @@ class SparseAutoencoder(HookedRootModule):
         self.setup()  # Required for `HookedRootModule`s
 
     def forward(self, x):
+        if x.shape[-1] != self.d_in:
+            x = x.reshape(-1, self.d_in)
         sae_in = self.hook_sae_in(
             x - self.b_dec
         )  # Remove encoder bias as per Anthropic
-
+        
         hidden_pre = self.hook_hidden_pre(
             einops.einsum(
                 sae_in,

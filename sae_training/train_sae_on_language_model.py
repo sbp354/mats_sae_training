@@ -206,7 +206,7 @@ def get_recons_loss(sparse_autoencder, model, activation_store, num_batches=5):
 
         # mean_abl_loss = model.run_with_hooks(tokens, return_type="loss",
         # fwd_hooks=[(utils.get_act_name("post", 0), mean_ablate_hook)])
-
+    
         recons_loss = model.run_with_hooks(
             batch_tokens,
             return_type="loss",
@@ -232,6 +232,9 @@ def get_recons_loss(sparse_autoencder, model, activation_store, num_batches=5):
 
 def replacement_hook(mlp_post, hook, encoder):
     mlp_post_reconstr = encoder(mlp_post)[0]
+
+    ##FIX THIS
+    mlp_post_reconstr = mlp_post_reconstr.reshape(32, 128, 12, 64)
     return mlp_post_reconstr
 
 
