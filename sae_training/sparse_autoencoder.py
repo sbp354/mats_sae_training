@@ -93,7 +93,7 @@ class SparseAutoencoder(HookedRootModule):
         )
         
         mse_loss = (sae_out.float() - x.float()).pow(2).sum(-1).mean(0)
-        l1_loss = self.l1_coefficient * torch.abs(feature_acts).sum()
+        l1_loss = l1_loss = self.l1_coefficient * torch.abs(feature_acts[...,:-12]).sum() + 5e-5 * torch.abs(feature_acts[...,:12]).sum()
         loss = mse_loss + l1_loss
 
         return sae_out, feature_acts, loss, mse_loss, l1_loss
@@ -175,7 +175,7 @@ class SparseAutoencoder(HookedRootModule):
                         print(
                             "Warning: it does not seem as if resetting the Adam parameters worked, there are shapes mismatches"
                         )
-                    if v[v_key][:, replacement_indices].abs().max().item() > 1e-6:
+                    if v[v_key][:, is_dead].abs().max().item() > 1e-6:
                         print(
                             "Warning: it does not seem as if resetting the Adam parameters worked"
                         )
